@@ -1,0 +1,41 @@
+//@version=5
+strategy("Moving Average and MACD Strategy", overlay=true)
+
+
+maLength = input(20, title="Moving Average Length")
+macdShort = input(12, title="MACD Short Period")
+macdLong = input(26, title="MACD Long Period")
+macdSignal = input(9, title="MACD Signal Period")
+
+startYear = input(2021, title="Start Year")
+startMonth = input.int(1, title="Start Month", minval=1, maxval=12)
+startDay = input.int(1, title="Start Day", minval=1, maxval=31)
+
+endYear = input(2021, title="End Year")
+endMonth = input.int(9, title="End Month", minval=1, maxval=12)
+endDay = input.int(31, title="End Day", minval=1, maxval=31)
+
+maValue = ta.sma(close, maLength)
+
+[macdLine, signalLine, _] = ta.macd(request.security(syminfo.tickerid, "M", close), macdShort, macdLong, macdSignal)
+
+inDateRange = year >= startYear and year <= endYear and
+              month >= startMonth and month <= endMonth and
+              dayofmonth >= startDay and dayofmonth <= endDay
+
+longCondition = inDateRange and ta.crossover(close, maValue) and ta.crossover(macdLine, signalLine)
+shortCondition = inDateRange and ta.crossunder(close, maValue) and ta.crossunder(macdLine, signalLine)
+
+exitLongCondition = inDateRange and (ta.crossunder(close, maValue) or ta.crossunder(macdLine, signalLine))
+exitShortCondition = inDateRange and (ta.crossover(close, maValue) or ta.crossover(macdLine, signalLine))
+
+strategy.entry("Long", strategy.long, when=longCondition)
+strategy.entry("Short", strategy.short, when=shortCondition)
+strategy.close("Long", when=exitLongCondition)
+strategy.close("Short", when=exitShortCondition)
+
+
+plotshape(series=longCondition, title="Long Entry", color=color.green, style=shape.triangleup, location=location.belowbar)
+plotshape(series=shortCondition, title="Short Entry", color=color.red, style=shape.triangledown, location=location.abovebar)
+plotshape(series=exitLongCondition, title="Long Exit", color=color.red, style=shape.triangledown, location=location.abovebar)
+plotshape(series=exitShortCondition, title="Short Exit", color=color.green, style=shape.triangleup, location=location.belowbar)

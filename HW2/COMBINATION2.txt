@@ -1,0 +1,43 @@
+//@version=5
+strategy("Combined Moving Average and ATR Strategy with Date Range", overlay=true)
+
+
+maLength = input(20, title="Moving Average Length")
+atrLength = input(14, title="ATR Length")
+multiplier = input(1.5, title="ATR Multiplier")
+
+
+startYear = input(2022, title="Start Year")
+startMonth = input.int(1, title="Start Month", minval=1, maxval=12)
+startDay = input.int(1, title="Start Day", minval=1, maxval=31)
+
+endYear = input(2023, title="End Year")
+endMonth = input.int(9, title="End Month", minval=1, maxval=12)
+endDay = input.int(31, title="End Day", minval=1, maxval=31)
+
+
+maValue = ta.sma(close, maLength)
+
+
+atrValue = ta.atr(atrLength)
+
+
+inDateRange = year >= startYear and year <= endYear and
+              month >= startMonth and month <= endMonth and
+              dayofmonth >= startDay and dayofmonth <= endDay
+
+longCondition = inDateRange and ta.crossover(close, maValue) and close > maValue + multiplier * atrValue
+shortCondition = inDateRange and ta.crossunder(close, maValue) and close < maValue - multiplier * atrValue
+
+exitLongCondition = inDateRange and (ta.crossunder(close, maValue) or close < maValue - multiplier * atrValue)
+exitShortCondition = inDateRange and (ta.crossover(close, maValue) or close > maValue + multiplier * atrValue)
+
+strategy.entry("Long", strategy.long, when=longCondition)
+strategy.entry("Short", strategy.short, when=shortCondition)
+strategy.close("Long", when=exitLongCondition)
+strategy.close("Short", when=exitShortCondition)
+
+plotshape(series=longCondition, title="Long Entry", color=color.green, style=shape.triangleup, location=location.belowbar)
+plotshape(series=shortCondition, title="Short Entry", color=color.red, style=shape.triangledown, location=location.abovebar)
+plotshape(series=exitLongCondition, title="Long Exit", color=color.red, style=shape.triangledown, location=location.abovebar)
+plotshape(series=exitShortCondition, title="Short Exit", color=color.green, style=shape.triangleup, location=location.belowbar)
