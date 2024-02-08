@@ -1,0 +1,52 @@
+//@version=5
+strategy("VWAP Strategy", shorttitle="VWAP Strategy", overlay=true)
+
+// Parameters for VWAP
+vwapLength = input.int(14, title="VWAP Length", minval=1, maxval=100, step=1)
+
+// Define Start and End Dates
+startYear = input.int(2021, title="Start Year", minval=1900)
+startMonth = input.int(1, title="Start Month", minval=1, maxval=12)
+startDay = input.int(1, title="Start Day", minval=1, maxval=31)
+endYear = input.int(2021, title="End Year", minval=1900)
+endMonth = input.int(3, title="End Month", minval=1, maxval=12)
+endDay = input.int(31, title="End Day", minval=1, maxval=31)
+
+// Calculate VWAP with date range filter
+var float vwap = na
+if (time >= timestamp(startYear, startMonth, startDay, 0, 0) and time <= timestamp(endYear, endMonth, endDay, 23, 59))
+    vwap := ta.sma(close * volume, vwapLength) / ta.sma(volume, vwapLength)
+
+// Buy and Sell conditions
+buyCondition = ta.crossover(close, vwap)
+sellCondition = ta.crossunder(close, vwap)
+
+// Define stop loss and take profit levels
+stopLossPercentage = input.float(1.3, title="Stop Loss Percentage", minval=1, maxval=10, step=1)
+takeProfitPercentage = input.float(13.82, title="Take Profit Percentage", minval=1, maxval=22, step=1)
+stopLossPrice = vwap * (1 - stopLossPercentage / 100)
+takeProfitPrice = vwap * (1 + takeProfitPercentage / 100)
+
+// Plot VWAP on the chart
+plot(vwap, color=color.blue, title="VWAP")
+
+var float stopLossLevel = na
+var float takeProfitLevel = na
+
+// Strategy logic
+if (buyCondition)
+    stopLossLevel := stopLossPrice
+    takeProfitLevel := takeProfitPrice
+
+if (sellCondition)
+    stopLossLevel := na
+    takeProfitLevel := na
+
+strategy.entry("Buy", strategy.long, when = buyCondition)
+
+if (stopLossLevel > 0)
+    strategy.exit("Take Profit/Stop Loss", from_entry = "Buy", stop = stopLossLevel, limit = takeProfitLevel)
+
+// Plot stop loss and take profit levels on the chart
+plotshape(series=sellCondition, title="Sell Signal", location=location.belowbar, color=color.red, style=shape.triangleup, text="Sell")
+plotshape(series=buyCondition, title="Buy Signal", location=location.abovebar, color=color.green, style=shape.triangledown, text="Buy")

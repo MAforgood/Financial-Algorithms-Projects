@@ -1,0 +1,53 @@
+//@version=5
+strategy("VWAP Strategy", shorttitle="VWAP Strategy", overlay=true)
+
+
+src = input(title="Source", defval=hlc3, group="VWAP Settings")
+vwapValue = ta.vwap(src)
+
+
+startYear = input.int(2022, title="Start Year", minval=1900)
+startMonth = input.int(1, title="Start Month", minval=1, maxval=12)
+startDay = input.int(1, title="Start Day", minval=1, maxval=31)
+endYear = input.int(2022, title="End Year", minval=1900)
+endMonth = input.int(1, title="End Month", minval=1, maxval=12)
+endDay = input.int(30, title="End Day", minval=1, maxval=31)
+
+
+startTimestamp = timestamp(startYear, startMonth, startDay, 0, 0)
+endTimestamp = timestamp(endYear, endMonth, endDay, 23, 59)
+inTimeRange = time >= startTimestamp and time <= endTimestamp
+
+
+buyCondition = ta.crossover(close, vwapValue) and inTimeRange
+sellCondition = ta.crossunder(close, vwapValue) and inTimeRange
+
+
+stopLossPercentage = input.float(3, title="Stop Loss Percentage", minval=1, maxval=10, step=1)
+takeProfitPercentage = input.float(20, title="Take Profit Percentage", minval=1, maxval=22, step=1)
+stopLossPrice = vwapValue * (1 - stopLossPercentage / 100)
+takeProfitPrice = vwapValue * (1 + takeProfitPercentage / 100)
+
+// Plot VWAP on the chart
+plot(vwapValue, color=color.blue, title="VWAP")
+
+var float stopLossLevel = na
+var float takeProfitLevel = na
+
+
+if (buyCondition)
+    stopLossLevel := stopLossPrice
+    takeProfitLevel := takeProfitPrice
+
+if (sellCondition)
+    stopLossLevel := na
+    takeProfitLevel := na
+
+strategy.entry("Buy", strategy.long, when = buyCondition)
+
+if (stopLossLevel > 0)
+    strategy.exit("Take Profit/Stop Loss", from_entry = "Buy", stop = stopLossLevel, limit = takeProfitLevel)
+
+
+plotshape(series=sellCondition, title="Sell Signal", location=location.belowbar, color=color.red, style=shape.triangleup, text="Sell")
+plotshape(series=buyCondition, title="Buy Signal", location=location.abovebar, color=color.green, style=shape.triangledown, text="Buy")
