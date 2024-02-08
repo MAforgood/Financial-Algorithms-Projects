@@ -101,7 +101,7 @@ For further details and implementation, refer to the provided code and documenta
 
 
 ## Project 6 : Bollinger Bands Strategy Implementation
-This repository contains the implementation of a version of the Bollinger Bands (BB) strategy for cryptocurrency trading.
+This Project contains the implementation of a version of the Bollinger Bands (BB) strategy for cryptocurrency trading.
 Strategy Overview
 
 The BB strategy calculates the Simple Moving Average (SMA) and Standard Deviation (SD) with a look-back period of 30 days using daily closing prices. When the price exceeds two SDs above the SMA, the strategy enters a short position equivalent to 1/2 unit of the cryptocurrency. Additionally, if the price exceeds four SDs above the SMA, another 1/2 unit is added to the short position. Instead of entering a full unit at once, the strategy enters 1/2 unit each time. The strategy exits the position when the price reaches one SD above the SMA. The opposite actions are taken for the Buy position.
