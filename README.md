@@ -75,3 +75,47 @@ Step 4: Performance Evaluation
     Implement the equity function and plot daily equity curves for the GARCH strategy, ARIMA strategy, and Buy & Hold strategy.
     Analyze the results using these metrics and equity curves to draw conclusions about the effectiveness of the strategies.
 
+## Project 5 : Cryptocurrency Market Cap Time Series Analysis
+This project focuses on creating time series data by combining the market capitalization of top-ranked cryptocurrencies. The goal is to ensure the stationarity of the created time series using statistical tests such as the Johansen test and Dickey-Fuller test.
+Methodology
+
+    Data Collection: Retrieve market capitalization data for the top-ranked cryptocurrencies based on market value. Utilize hourly timeframes for data collection within the period from January 1, 2022, to November 1, 2023.
+
+    Stationarity Testing: Apply the Stationary Mean test with a confidence level of 95% to confirm the stationarity of the obtained time series data.
+
+    Results Reporting: Report the following:
+        Cryptocurrency names, their weights, and the P-values of the obtained results.
+        Compute the Hurst exponent for the new time series.
+        Calculate the half-life time for the obtained series.
+
+Submission Requirements
+
+    Submit the executed code related to this exercise in a Jupyter notebook (.ipynb) file.
+    Include detailed explanations of the implemented cells in a zip file format.
+
+Data Source
+
+    Data will be sourced from close prices within the specified timeframe (January 1, 2022, to             November 1, 2023) for computation purposes.
+
+For further details and implementation, refer to the provided code and documentation.
+
+
+## Project 6 : Bollinger Bands Strategy Implementation
+This repository contains the implementation of a version of the Bollinger Bands (BB) strategy for cryptocurrency trading.
+Strategy Overview
+
+The BB strategy calculates the Simple Moving Average (SMA) and Standard Deviation (SD) with a look-back period of 30 days using daily closing prices. When the price exceeds two SDs above the SMA, the strategy enters a short position equivalent to 1/2 unit of the cryptocurrency. Additionally, if the price exceeds four SDs above the SMA, another 1/2 unit is added to the short position. Instead of entering a full unit at once, the strategy enters 1/2 unit each time. The strategy exits the position when the price reaches one SD above the SMA. The opposite actions are taken for the Buy position.
+Implementation Steps
+
+Data Preparation
+
+    Utilize the combined price series obtained from the previous exercise (Exercise 5) within the timeframe from January 1, 2022, to November 1, 2023.
+
+Strategy Execution
+
+    Implement the BB strategy described above on the combined price series.
+
+Performance Evaluation
+    
+        Calculate the Sharpe Ratio and Equity using the functions implemented in Exercise 4.
+        Report the results.
